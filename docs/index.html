@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,79 +74,6 @@
     });
   </script>
 </body>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R-Collaboration AI</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>R-Collaboration AI 💜</h1>
-    <p>Website untuk auto collaboration & auto posting Instagram</p>
-
-    <!-- Login Manual -->
-    <div class="login-section">
-      <h2>🔐 Login Manual (Username & Password)</h2>
-      <form id="manualForm">
-        <input type="text" id="akun1" placeholder="Akun 1 (Mengajak)">
-        <input type="password" id="akun1_pass" placeholder="Password Akun 1">
-        <input type="text" id="akun2" placeholder="Akun 2 (Menerima)">
-        <input type="password" id="akun2_pass" placeholder="Password Akun 2">
-        <button type="submit">Login Manual</button>
-      </form>      
-    </div>
-  
-    <!-- Login Cookie -->
-    <div class="login-section">
-      <h2>🍪 Login Otomatis (Cookie Instagram)</h2>
-      <p>Masukkan kode cookie yang diminta ke Owner</p>
-      <form id="cookieForm">
-        <textarea id="cookie" placeholder="Tempelkan kode cookie di sini..."></textarea><br><br>
-        <button type="submit">Login dengan Cookie</button>
-      </form>
-    </div>
-
-    <!-- Upload Section -->
-    <div id="upload-section" style="display: none; margin-top: 30px;">
-      <h2>Upload Postingan</h2>
-
-      <div id="drag-area" class="drag-area">Tarik file ke sini atau klik untuk pilih</div>
-      <input type="file" id="fileInput" accept="image/*,video/*" style="display: none;"><br>
-
-      <label>Caption:</label><br>
-      <textarea id="captionInput" rows="4" cols="50" placeholder="Tulis caption kamu di sini yaa sayang~"></textarea><br><br>
-
-      <label>Jadwal Posting:</label><br>
-      <input type="datetime-local" id="scheduleInput"><br><br>
-
-      <button onclick="uploadPost()">Upload & Jadwalkan</button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-  <script>
-    const dragArea = document.getElementById("drag-area");
-    const fileInput = document.getElementById("fileInput");
-
-    dragArea.addEventListener("click", () => fileInput.click());
-
-    dragArea.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dragArea.classList.add("dragover");
-    });
-
-    dragArea.addEventListener("dragleave", () => {
-      dragArea.classList.remove("dragover");
-    });
-
-    dragArea.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dragArea.classList.remove("dragover");
-      fileInput.files = e.dataTransfer.files;
     });
   </script>
 </body>
