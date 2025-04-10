@@ -1,0 +1,30 @@
+name: Auto Instagram Post
+
+on:
+  schedule:
+    - cron: '*/1 * * * *'  # tiap 1 menit
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install instagrapi
+
+      - name: Tulis login info ke file
+        run: |
+          mkdir data
+          echo "{\"akun1\": \"$AKUN1_USERNAME\", \"akun1_pass\": \"$AKUN1_PASSWORD\", \"akun2\": \"$AKUN2_USERNAME\", \"akun2_pass\": \"$AKUN2_PASSWORD\"}" > data/login.json
+
+      - name: Jalankan Scheduler
+        run: |
+          python backend/run_scheduler.py

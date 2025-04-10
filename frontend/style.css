@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f2ebfb;
+  color: #4c0070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  text-align: center;
+}
+
+.login-section {
+  background: white;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 20px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+input,
+textarea,
+button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #7e2f8e;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #6a267a;
+}
+
+textarea {
+  resize: vertical;
+}
+
+#upload-section {
+  background: white;
+  padding: 20px;
+  margin-top: 30px;
+  border-radius: 20px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.drag-area {
+  border: 2px dashed #b58ed2;
+  padding: 30px;
+  border-radius: 15px;
+  background-color: #faf3ff;
+  color: #7e2f8e;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.drag-area.dragover {
+  background-color: #e6d4f7;
+  border-color: #7e2f8e;
+}
