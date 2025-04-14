@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Automatic - R-Collaboration AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Login Automatic</h1>
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Kembali</a>
+        </header>
+
+        <div class="login-form-container">
+            <h2><i class="fas fa-key"></i> Masukkan Kode Login</h2>
+            <form id="auto-login-form" class="login-form">
+                <div class="form-group">
+                    <label for="auto-code">Kode Login</label>
+                    <input type="text" id="auto-code" name="auto-code" required 
+                           placeholder="Masukkan kode yang diterima dari email">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="login-button">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="code-request-section">
+            <h2><i class="fas fa-envelope"></i> Request Kode Login</h2>
+            <form id="code-request-form" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="Masukkan email Anda">
+                </div>
+                <div class="form-group">
+                    <label for="username">Username Instagram</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="@username">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="request-button">
+                        <i class="fas fa-paper-plane"></i> Kirim Permintaan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-section">
+            <h3><i class="fas fa-info-circle"></i> Informasi</h3>
+            <p>Kode login akan dikirimkan ke email roufprivate@gmail.com</p>
+            <p>Setiap kode hanya dapat digunakan sekali</p>
+            <p>Proses verifikasi membutuhkan waktu 1x24 jam</p>
+        </div>
+    </div>
+    <script src="js/login-auto.js"></script>
+</body>
+</html> 

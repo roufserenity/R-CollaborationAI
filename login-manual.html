@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Manual - R-Collaboration AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Login Manual</h1>
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Kembali</a>
+        </header>
+
+        <div class="login-forms">
+            <div class="login-form-container">
+                <h2><i class="fas fa-user"></i> Akun yang Mengajak Kolaborasi (Akun 1)</h2>
+                <form id="account1-form" class="login-form">
+                    <div class="form-group">
+                        <label for="username1">Username Instagram</label>
+                        <input type="text" id="username1" name="username1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password1">Password</label>
+                        <input type="password" id="password1" name="password1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="a2f1">Kode A2F (jika ada)</label>
+                        <input type="text" id="a2f1" name="a2f1">
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="remember1" name="remember1">
+                            <span class="checkmark"></span>
+                            Ingat Saya
+                        </label>
+                    </div>
+                </form>
+            </div>
+
+            <div class="login-form-container">
+                <h2><i class="fas fa-user-friends"></i> Akun yang Menerima Kolaborasi (Akun 2)</h2>
+                <form id="account2-form" class="login-form">
+                    <div class="form-group">
+                        <label for="username2">Username Instagram</label>
+                        <input type="text" id="username2" name="username2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Password</label>
+                        <input type="password" id="password2" name="password2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="a2f2">Kode A2F (jika ada)</label>
+                        <input type="text" id="a2f2" name="a2f2">
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="remember2" name="remember2">
+                            <span class="checkmark"></span>
+                            Ingat Saya
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="login-button" onclick="handleLogin()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </div>
+    </div>
+    <script src="js/login.js"></script>
+</body>
+</html> 

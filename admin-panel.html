@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - R-Collaboration AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin Panel</h1>
+            <div class="admin-info">
+                <span id="admin-username"></span>
+                <a href="index.html" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <div class="admin-section">
+                <h2><i class="fas fa-key"></i> Permintaan Kode Login</h2>
+                <div class="requests-list" id="code-requests">
+                    <!-- Requests will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h2><i class="fas fa-users"></i> Pengguna Terdaftar</h2>
+                <div class="users-list" id="registered-users">
+                    <!-- Users will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h2><i class="fas fa-calendar-check"></i> Postingan Terjadwal</h2>
+                <div class="posts-list" id="scheduled-posts">
+                    <!-- Posts will be added here dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <div id="notification" class="notification" style="display: none;">
+            <p id="notification-message"></p>
+            <button class="close-notification" onclick="closeNotification()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <script src="js/admin.js"></script>
+</body>
+</html> 

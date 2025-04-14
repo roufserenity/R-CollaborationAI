@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - R-Collaboration AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>R-Collaboration AI</h1>
+            <div class="user-info">
+                <span id="account1-username"></span>
+                <span class="separator">|</span>
+                <span id="account2-username"></span>
+            </div>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <h2><i class="fas fa-upload"></i> Upload Konten</h2>
+                <form id="upload-form" class="upload-form">
+                    <div class="form-group">
+                        <label for="media-upload">Upload Foto/Video</label>
+                        <div class="upload-area" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop file atau klik untuk memilih</p>
+                            <input type="file" id="media-upload" accept="image/*,video/*" hidden>
+                        </div>
+                        <p class="file-info">Maksimal ukuran: 50MB</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="caption">Caption</label>
+                        <textarea id="caption" rows="4" placeholder="Tulis caption untuk postingan..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="schedule">Jadwal Posting</label>
+                        <input type="datetime-local" id="schedule" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="collab-username">Username Kolaborasi</label>
+                        <input type="text" id="collab-username" placeholder="@username" required>
+                    </div>
+
+                    <button type="submit" class="submit-button">
+                        <i class="fas fa-paper-plane"></i> Kirim & Ajukan Kolaborasi
+                    </button>
+                </form>
+            </div>
+
+            <div class="scheduled-posts">
+                <h2><i class="fas fa-calendar-alt"></i> Postingan Terjadwal</h2>
+                <div class="posts-list" id="scheduled-posts">
+                    <!-- Posts will be added here dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <div id="notification" class="notification" style="display: none;">
+            <p>Postingan akan diupload sesuai jadwal</p>
+            <button class="close-notification" onclick="closeNotification()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <footer>
+            <p>Visit our Instagram: 
+                <a href="https://instagram.com/roufdarkside">@roufdarkside</a> | 
+                <a href="https://instagram.com/roufserenity">@roufserenity</a> | 
+                <a href="https://instagram.com/exclusive4queeen">@exclusive4queeen</a>
+            </p>
+            <p>GitHub: <a href="https://github.com/yourusername">R-CollaborationAI</a></p>
+        </footer>
+    </div>
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 
