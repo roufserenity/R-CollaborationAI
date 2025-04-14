@@ -6,6 +6,23 @@ const MAX_SCHEDULED_POSTS = 5;
 let scheduledPosts = [];
 let currentFile = null;
 
+// Enhanced file validation system
+const FILE_VALIDATION = {
+    maxSize: 100 * 1024 * 1024, // 100MB
+    allowedTypes: {
+        image: ['image/jpeg', 'image/png', 'image/gif'],
+        video: ['video/mp4', 'video/quicktime', 'video/x-msvideo']
+    },
+    maxDimensions: {
+        width: 4096,
+        height: 4096
+    },
+    minDimensions: {
+        width: 320,
+        height: 320
+    }
+};
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     initializeDashboard();
@@ -200,4 +217,217 @@ function closeNotification() {
     const notification = document.getElementById('notification');
     notification.style.display = 'none';
     window.location.reload();
+}
+
+// Auto-accept collaboration system
+async function autoAcceptCollaboration(postData) {
+    try {
+        // Check if auto-accept is enabled
+        const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+        if (!settings.autoAccept) {
+            return { success: false, message: 'Auto-accept is disabled' };
+        }
+
+        // Get collaboration criteria
+        const criteria = settings.collaborationCriteria || {
+            minFollowers: 1000,
+            minEngagement: 3,
+            preferredCategories: []
+        };
+
+        // Check if post meets criteria
+        const meetsCriteria = await checkCollaborationCriteria(postData, criteria);
+        if (!meetsCriteria) {
+            return { success: false, message: 'Post does not meet collaboration criteria' };
+        }
+
+        // Auto-accept the collaboration
+        const result = await acceptCollaboration(postData.id);
+        
+        // Send notification
+        showNotification('Collaboration auto-accepted', 'success');
+        
+        return { success: true, message: 'Collaboration auto-accepted' };
+    } catch (error) {
+        console.error('Auto-accept error:', error);
+        return { success: false, message: 'Auto-accept failed: ' + error.message };
+    }
+}
+
+async function checkCollaborationCriteria(postData, criteria) {
+    // Check follower count
+    if (postData.followers < criteria.minFollowers) {
+        return false;
+    }
+
+    // Check engagement rate
+    const engagementRate = (postData.likes + postData.comments) / postData.followers * 100;
+    if (engagementRate < criteria.minEngagement) {
+        return false;
+    }
+
+    // Check categories
+    if (criteria.preferredCategories.length > 0) {
+        const hasMatchingCategory = postData.categories.some(cat => 
+            criteria.preferredCategories.includes(cat)
+        );
+        if (!hasMatchingCategory) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+async function acceptCollaboration(postId) {
+    // Simulate API call to accept collaboration
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({ success: true });
+        }, 1000);
+    });
+}
+
+// Add event listener for auto-accept toggle
+document.addEventListener('DOMContentLoaded', () => {
+    const autoAcceptToggle = document.getElementById('autoAcceptToggle');
+    if (autoAcceptToggle) {
+        autoAcceptToggle.addEventListener('change', (e) => {
+            const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+            settings.autoAccept = e.target.checked;
+            localStorage.setItem('userSettings', JSON.stringify(settings));
+            showNotification(
+                e.target.checked ? 'Auto-accept enabled' : 'Auto-accept disabled',
+                'info'
+            );
+        });
+    }
+});
+
+async function validateFile(file) {
+    const errors = [];
+    
+    // Check file size
+    if (file.size > FILE_VALIDATION.maxSize) {
+        errors.push(`File size exceeds ${FILE_VALIDATION.maxSize / 1024 / 1024}MB limit`);
+    }
+    
+    // Check file type
+    const isImage = FILE_VALIDATION.allowedTypes.image.includes(file.type);
+    const isVideo = FILE_VALIDATION.allowedTypes.video.includes(file.type);
+    
+    if (!isImage && !isVideo) {
+        errors.push('Invalid file type. Only images (JPEG, PNG, GIF) and videos (MP4, MOV, AVI) are allowed');
+    }
+    
+    // Check dimensions for images
+    if (isImage) {
+        const dimensions = await getImageDimensions(file);
+        if (dimensions.width > FILE_VALIDATION.maxDimensions.width || 
+            dimensions.height > FILE_VALIDATION.maxDimensions.height) {
+            errors.push(`Image dimensions exceed ${FILE_VALIDATION.maxDimensions.width}x${FILE_VALIDATION.maxDimensions.height} pixels`);
+        }
+        if (dimensions.width < FILE_VALIDATION.minDimensions.width || 
+            dimensions.height < FILE_VALIDATION.minDimensions.height) {
+            errors.push(`Image dimensions must be at least ${FILE_VALIDATION.minDimensions.width}x${FILE_VALIDATION.minDimensions.height} pixels`);
+        }
+    }
+    
+    // Check video duration
+    if (isVideo) {
+        const duration = await getVideoDuration(file);
+        if (duration > 60) { // 60 seconds max
+            errors.push('Video duration exceeds 60 seconds limit');
+        }
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors
+    };
+}
+
+function getImageDimensions(file) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve({
+                width: img.width,
+                height: img.height
+            });
+        };
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+function getVideoDuration(file) {
+    return new Promise((resolve) => {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+            URL.revokeObjectURL(video.src);
+            resolve(video.duration);
+        };
+        video.src = URL.createObjectURL(file);
+    });
+}
+
+// Update file upload handler
+async function handleFileUpload(files) {
+    const uploadStatus = document.getElementById('uploadStatus');
+    const fileList = document.getElementById('fileList');
+    
+    for (const file of files) {
+        try {
+            // Validate file
+            const validation = await validateFile(file);
+            if (!validation.isValid) {
+                showNotification(validation.errors.join('\n'), 'error');
+                continue;
+            }
+            
+            // Create preview
+            const preview = document.createElement('div');
+            preview.className = 'file-preview';
+            
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                preview.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                preview.appendChild(video);
+            }
+            
+            // Add file info
+            const info = document.createElement('div');
+            info.className = 'file-info';
+            info.innerHTML = `
+                <span>${file.name}</span>
+                <span>${(file.size / 1024 / 1024).toFixed(2)} MB</span>
+            `;
+            preview.appendChild(info);
+            
+            fileList.appendChild(preview);
+            
+            // Save file data
+            const fileData = {
+                id: generateUniqueId(),
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                uploadDate: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            saveFileData(fileData);
+            showNotification('File uploaded successfully', 'success');
+            
+        } catch (error) {
+            console.error('File upload error:', error);
+            showNotification('File upload failed: ' + error.message, 'error');
+        }
+    }
 } 

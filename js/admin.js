@@ -115,38 +115,126 @@ function loadScheduledPosts() {
     });
 }
 
-// Approve request
-function approveRequest(index) {
-    const requests = JSON.parse(localStorage.getItem('codeRequests') || '[]');
-    requests[index].status = 'approved';
-    localStorage.setItem('codeRequests', JSON.stringify(requests));
-    
-    // Kirim email dengan kode
-    sendEmail(
-        requests[index].email,
-        'Kode Login R-Collaboration AI',
-        `Kode login Anda: ${requests[index].code}`
-    );
+// Logging system
+const LOG_TYPES = {
+    INFO: 'info',
+    WARNING: 'warning',
+    ERROR: 'error',
+    SUCCESS: 'success'
+};
 
-    showNotification('Permintaan disetujui dan kode telah dikirim');
-    loadCodeRequests();
+function logActivity(type, action, details) {
+    const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+    const log = {
+        timestamp: new Date().toISOString(),
+        type,
+        action,
+        details,
+        user: currentUser
+    };
+    
+    logs.unshift(log);
+    // Keep only last 1000 logs
+    if (logs.length > 1000) {
+        logs.pop();
+    }
+    
+    localStorage.setItem('activityLogs', JSON.stringify(logs));
 }
 
-// Reject request
-function rejectRequest(index) {
-    const requests = JSON.parse(localStorage.getItem('codeRequests') || '[]');
-    requests[index].status = 'rejected';
-    localStorage.setItem('codeRequests', JSON.stringify(requests));
+function getActivityLogs(filters = {}) {
+    let logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
     
-    // Kirim email penolakan
-    sendEmail(
-        requests[index].email,
-        'Status Permintaan R-Collaboration AI',
-        'Maaf, permintaan Anda ditolak.'
-    );
+    // Apply filters
+    if (filters.type) {
+        logs = logs.filter(log => log.type === filters.type);
+    }
+    if (filters.user) {
+        logs = logs.filter(log => log.user === filters.user);
+    }
+    if (filters.startDate) {
+        logs = logs.filter(log => new Date(log.timestamp) >= new Date(filters.startDate));
+    }
+    if (filters.endDate) {
+        logs = logs.filter(log => new Date(log.timestamp) <= new Date(filters.endDate));
+    }
+    
+    return logs;
+}
 
-    showNotification('Permintaan ditolak');
-    loadCodeRequests();
+function exportLogs(format = 'json') {
+    const logs = getActivityLogs();
+    
+    if (format === 'json') {
+        const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `activity-logs-${new Date().toISOString()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } else if (format === 'csv') {
+        const headers = ['timestamp', 'type', 'action', 'details', 'user'];
+        const csvContent = [
+            headers.join(','),
+            ...logs.map(log => [
+                log.timestamp,
+                log.type,
+                log.action,
+                `"${log.details}"`,
+                log.user
+            ].join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `activity-logs-${new Date().toISOString()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+}
+
+// Update existing functions to include logging
+function approveRequest(requestId) {
+    const request = codeRequests.find(r => r.id === requestId);
+    if (request) {
+        request.status = 'approved';
+        request.approvedAt = new Date().toISOString();
+        request.approvedBy = currentUser;
+        
+        // Log the approval
+        logActivity(LOG_TYPES.SUCCESS, 'approve_request', {
+            requestId,
+            username: request.username,
+            email: request.email
+        });
+        
+        saveCodeRequests();
+        loadCodeRequests();
+        showNotification('Request approved successfully', 'success');
+    }
+}
+
+function rejectRequest(requestId) {
+    const request = codeRequests.find(r => r.id === requestId);
+    if (request) {
+        request.status = 'rejected';
+        request.rejectedAt = new Date().toISOString();
+        request.rejectedBy = currentUser;
+        
+        // Log the rejection
+        logActivity(LOG_TYPES.WARNING, 'reject_request', {
+            requestId,
+            username: request.username,
+            email: request.email
+        });
+        
+        saveCodeRequests();
+        loadCodeRequests();
+        showNotification('Request rejected', 'warning');
+    }
 }
 
 // Delete request

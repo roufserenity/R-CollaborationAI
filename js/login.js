@@ -15,54 +15,98 @@ function getSavedLoginData(accountNumber) {
     return JSON.parse(localStorage.getItem(key) || '{}');
 }
 
+// Rate limiting system
+const RATE_LIMITS = {
+    login: {
+        maxAttempts: 5,
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        blockDuration: 30 * 60 * 1000 // 30 minutes
+    },
+    codeRequest: {
+        maxAttempts: 3,
+        windowMs: 60 * 60 * 1000, // 1 hour
+        blockDuration: 24 * 60 * 60 * 1000 // 24 hours
+    }
+};
+
+function checkRateLimit(type, identifier) {
+    const limits = RATE_LIMITS[type];
+    if (!limits) return true;
+
+    const now = Date.now();
+    const attempts = JSON.parse(localStorage.getItem(`rateLimit_${type}_${identifier}`) || '[]');
+    
+    // Clean old attempts
+    const validAttempts = attempts.filter(time => now - time < limits.windowMs);
+    
+    // Check if blocked
+    const lastBlock = localStorage.getItem(`rateLimit_block_${type}_${identifier}`);
+    if (lastBlock && now - parseInt(lastBlock) < limits.blockDuration) {
+        return false;
+    }
+    
+    // Check attempts
+    if (validAttempts.length >= limits.maxAttempts) {
+        // Block the identifier
+        localStorage.setItem(`rateLimit_block_${type}_${identifier}`, now.toString());
+        return false;
+    }
+    
+    // Add new attempt
+    validAttempts.push(now);
+    localStorage.setItem(`rateLimit_${type}_${identifier}`, JSON.stringify(validAttempts));
+    return true;
+}
+
+function getRemainingAttempts(type, identifier) {
+    const limits = RATE_LIMITS[type];
+    if (!limits) return Infinity;
+
+    const now = Date.now();
+    const attempts = JSON.parse(localStorage.getItem(`rateLimit_${type}_${identifier}`) || '[]');
+    const validAttempts = attempts.filter(time => now - time < limits.windowMs);
+    
+    return Math.max(0, limits.maxAttempts - validAttempts.length);
+}
+
+function getBlockTimeRemaining(type, identifier) {
+    const lastBlock = localStorage.getItem(`rateLimit_block_${type}_${identifier}`);
+    if (!lastBlock) return 0;
+
+    const now = Date.now();
+    const blockEnd = parseInt(lastBlock) + RATE_LIMITS[type].blockDuration;
+    return Math.max(0, blockEnd - now);
+}
+
 // Fungsi untuk menangani login
-async function handleLogin() {
-    const account1Data = {
-        username: document.getElementById('username1').value,
-        password: document.getElementById('password1').value,
-        a2f: document.getElementById('a2f1').value,
-        rememberMe: document.getElementById('remember1').checked
-    };
-
-    const account2Data = {
-        username: document.getElementById('username2').value,
-        password: document.getElementById('password2').value,
-        a2f: document.getElementById('a2f2').value,
-        rememberMe: document.getElementById('remember2').checked
-    };
-
-    // Validasi input
-    if (!account1Data.username || !account1Data.password || !account2Data.username || !account2Data.password) {
-        alert('Mohon lengkapi semua field yang diperlukan');
+async function handleLogin(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const rememberMe = document.getElementById('rememberMe').checked;
+    
+    // Check rate limit
+    if (!checkRateLimit('login', username)) {
+        const blockTime = getBlockTimeRemaining('login', username);
+        const minutes = Math.ceil(blockTime / 60000);
+        showNotification(`Too many login attempts. Please try again in ${minutes} minutes.`, 'error');
         return;
     }
-
+    
     try {
-        // Simpan data jika "Ingat Saya" dicentang
-        if (account1Data.rememberMe) {
-            const serialNumber1 = generateSerialNumber();
-            account1Data.serialNumber = serialNumber1;
-            saveLoginData('1', account1Data);
-        }
-
-        if (account2Data.rememberMe) {
-            const serialNumber2 = generateSerialNumber();
-            account2Data.serialNumber = serialNumber2;
-            saveLoginData('2', account2Data);
-        }
-
-        // Proses login Instagram (akan diimplementasikan dengan metode non-API)
-        const loginResult = await processInstagramLogin(account1Data, account2Data);
-        
-        if (loginResult.success) {
-            // Redirect ke halaman dashboard
+        const result = await processInstagramLogin({ username, password });
+        if (result.success) {
+            if (rememberMe) {
+                localStorage.setItem('rememberedUser', username);
+            }
             window.location.href = 'dashboard.html';
         } else {
-            alert(loginResult.message || 'Login gagal. Silakan coba lagi.');
+            showNotification(result.message, 'error');
         }
     } catch (error) {
         console.error('Login error:', error);
-        alert('Terjadi kesalahan saat login. Silakan coba lagi.');
+        showNotification('Login failed: ' + error.message, 'error');
     }
 }
 
