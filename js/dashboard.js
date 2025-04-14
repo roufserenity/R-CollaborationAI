@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDashboard();
     setupFileUpload();
     loadScheduledPosts();
+    setupAutoCollaboration();
 });
 
 // Inisialisasi Dashboard
@@ -100,7 +101,28 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// Handle Form Submit
+// Setup auto collaboration
+function setupAutoCollaboration() {
+    const collabUsernameInput = document.getElementById('collab-username');
+    const account2Data = JSON.parse(localStorage.getItem('instagramLogin_2') || '{}');
+    
+    if (account2Data && account2Data.username) {
+        collabUsernameInput.value = account2Data.username;
+        collabUsernameInput.setAttribute('readonly', true);
+        
+        // Add info text
+        const infoText = document.createElement('small');
+        infoText.className = 'auto-collab-info';
+        infoText.textContent = 'Username kolaborasi otomatis diset dari akun kedua';
+        infoText.style.color = 'var(--primary-color)';
+        infoText.style.display = 'block';
+        infoText.style.marginTop = '5px';
+        
+        collabUsernameInput.parentNode.appendChild(infoText);
+    }
+}
+
+// Update handleFormSubmit to use auto collaboration
 async function handleFormSubmit(e) {
     e.preventDefault();
 
@@ -114,11 +136,14 @@ async function handleFormSubmit(e) {
         return;
     }
 
+    const account2Data = JSON.parse(localStorage.getItem('instagramLogin_2') || '{}');
+    const collabUsername = account2Data.username || document.getElementById('collab-username').value;
+
     const formData = {
         file: currentFile,
         caption: document.getElementById('caption').value,
         schedule: document.getElementById('schedule').value,
-        collabUsername: document.getElementById('collab-username').value
+        collabUsername: collabUsername
     };
 
     try {
@@ -133,7 +158,7 @@ async function handleFormSubmit(e) {
         resetForm();
         
         // Tampilkan notifikasi
-        showNotification();
+        showNotification('Postingan berhasil dijadwalkan dengan kolaborasi otomatis', 'success');
     } catch (error) {
         console.error('Error submitting form:', error);
         alert('Terjadi kesalahan saat menyimpan postingan');
